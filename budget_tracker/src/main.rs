@@ -21,7 +21,7 @@ fn main() {
         };
     }
 
-    println!("Overall Budget: {parsed_input}");
+    println!("Overall Budget: ${parsed_input}");
 
     print!("How many items are you paying for with this budget?: "); // input prompt
     let mut item_count = 0;
@@ -43,8 +43,8 @@ fn main() {
     let mut all_costs: Vec<u64> = vec![];
 
     for i in 1..=item_count {
-        print!("What is the name of item number {i}?: ");
-        //problem: runs read_line before print
+        println!("What is the name of item number {i}?: ");
+        //problem: runs read_line before print; resolved: unknown, it fixed itself and I'm scared to mess with it anymore
         let mut item = String::new(); // creates a string variable to store information about the cost
         io::stdin().read_line(&mut item).expect("Failed to read line");
         println!("");
@@ -65,8 +65,9 @@ fn main() {
                 }
             };
         }
+        println!("");
 
-        println!("Item: {item}; Item Cost: {cost_buf} ");
+        println!("Item: {item}Item Cost: {cost_buf} ");
         item_list.insert(
             item,
             cost_buf,
@@ -75,18 +76,31 @@ fn main() {
         all_costs.push(item_cost);
     }
 
-    for (k, v) in &item_list {
-        println!("{k}: {v}");
-    }
-
     let mut total_cost: u64 = 0;
 
     for j in 0..all_costs.len() {
         total_cost += all_costs[j];
     }
 
-    let remaining_budget: u64 = parsed_input - total_cost;
+    //converts budget and cost into signed integers to handle negative numbers to subtract into remaining budget
+    let signed_input: i64 = match parsed_input.try_into() {
+        Ok(val) => val,
+        Err(_) => 0
+    };
 
-    println!("Total Cost: {total_cost}");
-    println!("Remaining Budget {remaining_budget}");
+    let signed_cost: i64 = match total_cost.try_into() {
+        Ok(val) => val,
+        Err(_) => 0
+    };
+
+    let remaining_budget: i64 = signed_input - signed_cost;
+
+    println!("Total Cost: ${total_cost}");
+    println!("Remaining Budget ${remaining_budget}");
+
+    if remaining_budget < 0 {
+        println!("Cost is exceeding budget, please re-evaluate budget.");
+    } else {
+        println!("Cost is in budget.");
+    }
 }
